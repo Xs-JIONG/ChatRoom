@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="vertical"
+	android:gravity="center">
+
+	<EditText
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:ems="10"
+		android:hint="用户名"
+		android:gravity="center"
+		android:id="@+id/enter_room_name"/>
+
+	<LinearLayout
+		android:layout_height="wrap_content"
+		android:layout_width="match_parent"
+		android:orientation="horizontal"
+		android:gravity="center">
+
+		<TextView
+			android:layout_height="wrap_content"
+			android:textAppearance="?android:attr/textAppearanceLarge"
+			android:layout_width="wrap_content"
+			android:text="224."/>
+
+		<EditText
+			android:layout_height="wrap_content"
+			android:layout_width="50dp"
+			android:ems="10"
+			android:hint="IP"
+			android:gravity="center"
+			android:id="@+id/enter_room_ip_1"
+			android:inputType="number"/>
+
+		<TextView
+			android:layout_height="wrap_content"
+			android:textAppearance="?android:attr/textAppearanceLarge"
+			android:layout_width="wrap_content"
+			android:text="."/>
+
+		<EditText
+			android:layout_height="wrap_content"
+			android:layout_width="50dp"
+			android:ems="10"
+			android:hint="IP"
+			android:gravity="center"
+			android:inputType="number"
+			android:id="@+id/enter_room_ip_2"/>
+
+		<TextView
+			android:layout_height="wrap_content"
+			android:textAppearance="?android:attr/textAppearanceLarge"
+			android:layout_width="wrap_content"
+			android:text="."/>
+
+		<EditText
+			android:layout_height="wrap_content"
+			android:inputType="number"
+			android:layout_width="50dp"
+			android:ems="10"
+			android:gravity="center"
+			android:hint="IP"
+			android:id="@+id/enter_room_ip_3"/>
+
+	</LinearLayout>
+
+	<EditText
+		android:layout_height="wrap_content"
+		android:inputType="number"
+		android:layout_width="wrap_content"
+		android:ems="10"
+		android:gravity="center"
+		android:hint="端口"
+		android:id="@+id/enter_roon_port"/>
+
+	<LinearLayout
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:orientation="horizontal">
+
+		<Button
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:text="加入房间"
+			android:id="@+id/enter_room_done"/>
+
+		<Button
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:text="创建房间"
+			android:id="@+id/enter_room_create"/>
+
+	</LinearLayout>
+
+</LinearLayout>
+
