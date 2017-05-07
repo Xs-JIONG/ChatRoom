@@ -18,5 +18,6 @@ public class ActivityList
 	
 	public static void exit() {
 		for (Activity one : list) one.finish();
+		System.exit(0);
 	}
 }

@@ -1,18 +1,18 @@
 package com.chat.room;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-import com.chat.room.MainActivity;
 import com.chat.room.R;
-import android.app.Dialog;
+import android.app.ProgressDialog;
+import java.io.PrintStream;
 
 public class EnterChatRoom extends BaseActivity
 {
@@ -25,8 +25,14 @@ public class EnterChatRoom extends BaseActivity
 	private EditText ip1;
 	private EditText ip2;
 	private EditText ip3;
+	public static boolean have=false;
 	private EditText po;
+	private boolean cancel=false;
 	private EditText name;
+	private boolean temp;
+	
+	public static String tempip;
+	public static String tempport;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -102,28 +108,87 @@ public class EnterChatRoom extends BaseActivity
 								alert("对不起，请不要使用广播IP！");
 								break;
 							}
-							AlertDialog.Builder b=new AlertDialog.Builder(EnterChatRoom.this);
-							b.setTitle("设置房间名称");
-							final EditText ed=new EditText(EnterChatRoom.this);
-							ed.setHint("名字");
-							b.setView(ed);
-							b.setCancelable(false);
-							b.setPositiveButton("确定", new Dialog.OnClickListener() {
+							cancel=false;
+							final ProgressDialog dialog=new ProgressDialog(EnterChatRoom.this);
+							dialog.setTitle("请稍后");
+							dialog.setCancelable(true);
+							dialog.setMessage("请稍后……");
+							dialog.setButton("取消", new DialogInterface.OnClickListener() {
 								@Override
-								public void onClick(DialogInterface dialog, int position) {
-									MainActivity.user=n;
-									Intent in=new Intent();
-									MainActivity.isOwner=true;
-									MainActivity.nameofroom=ed.getText().toString();
-									in.putExtra("ip", getIP());
-									in.putExtra("port", Integer.parseInt(po.getText().toString()));
-									setResult(RESULT_OK, in);
-									finish();
+								public void onClick(DialogInterface dial, int position) {
+									cancel=true;
+									dialog.dismiss();
 								}
 							});
-							b.show();
+							dialog.show();
+							tempip=getIP();
+							tempport=po.getText().toString();
+							String ask=MainActivity.askRen+getIP()+","+Integer.parseInt(po.getText().toString());
+							NetBroadcast.sendMsg(ask);
+							NetBroadcast.setNow(MainActivity.askRen);
+							new Thread() {
+								@Override
+								public void run() {
+									temp=true;
+									for (int i=0;i<30;i++) {
+										if (temp == false) break;
+										if (cancel) {temp=false; break;}
+										if (have) {
+											EnterChatRoom.this.runOnUiThread(new Runnable() {
+												@Override
+												public void run() {
+													alert("已经有这个房间了！");
+													dialog.dismiss();
+													temp=false;
+												}
+											});
+											break;
+										} else {
+											try {
+												sleep(100);
+											} catch (InterruptedException e) {
+												
+											}
+										}
+									}
+									if (temp) {
+									dialog.dismiss();
+									EnterChatRoom.this.runOnUiThread(new Runnable() {
+										@Override
+										public void run() {
+											if (temp) 输入名字();
+										}
+									});
+									}
+								}
+							}.start();
 							break;
 					}
+				}
+
+				private void 输入名字()
+				{
+					AlertDialog.Builder b=new AlertDialog.Builder(EnterChatRoom.this);
+					b.setTitle("设置房间名称");
+					final EditText ed=new EditText(EnterChatRoom.this);
+					ed.setHint("名字");
+					b.setView(ed);
+					b.setCancelable(false);
+					b.setPositiveButton("确定", new Dialog.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int position)
+							{
+								MainActivity.user=name.getText().toString();
+								Intent in=new Intent();
+								MainActivity.isOwner = true;
+								MainActivity.nameofroom = ed.getText().toString();
+								in.putExtra("ip", getIP());
+								in.putExtra("port", Integer.parseInt(po.getText().toString()));
+								setResult(RESULT_OK, in);
+								finish();
+							}
+						});
+					b.show();
 				}
 			});
 	}
@@ -152,7 +217,6 @@ public class EnterChatRoom extends BaseActivity
 	@Override
 	public void onBackPressed()
 	{
-		
 		exit();
 	}
 	

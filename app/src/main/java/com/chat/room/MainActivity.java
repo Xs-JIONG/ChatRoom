@@ -1,42 +1,43 @@
 package com.chat.room;
 
-import android.app.Activity;
-import android.os.Bundle;
-import java.net.*;
-import android.widget.EditText;
-import android.widget.Button;
-import android.widget.TextView;
-import android.os.Handler;
-import android.os.Message;
-import android.view.View;
-import android.view.LayoutInflater;
-import android.widget.Toast;
-import android.view.View.OnClickListener;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.util.Log;
+import android.os.Bundle;
+import android.os.Handler;
+import android.text.TextUtils;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+import com.chat.room.BaseActivity;
+import com.chat.room.EnterChatRoom;
+import com.chat.room.R;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
 
 public class MainActivity extends BaseActivity 
 {
 	public final static String sys="系统";
 	public static String user="用户";
 	public final static String askName="::name";
+	public final static String askRen="::ren";
 	public final static int TYPE_ADDTEXT=1;
 	
 	public final static String welcome="欢迎使用局域网聊天室！";
 	
-	private int port=0;
+	public static int port=0;
 	private InetAddress iadr=null;
 	private MulticastSocket socket=null;
 	private boolean confi=false;
 	public static String nameofroom;
 	public static boolean isOwner=false;
-	private String ip;
+	public static String ip;
 	private EditText edit;
 	private Button send;
 	private boolean pressBack=false;
-	private TextView result;
+	private static TextView result;
 	/*private Handler han=new Handler() {
 		@Override
 		public void handleMessage(Message msg)
@@ -49,7 +50,7 @@ public class MainActivity extends BaseActivity
 		}
 	};*/
 	
-	private void print(String who, String text) {
+	private static void print(String who, String text) {
 		String con=new StringBuilder("[").append(who).append("]").append(text).append("\n").toString();
 		/*Message msg=new Message();
 		msg.what=TYPE_ADDTEXT;
@@ -63,12 +64,17 @@ public class MainActivity extends BaseActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+		NetBroadcast.init();
 		edit=(EditText) findViewById(R.id.chat_edit);
 		send=(Button) findViewById(R.id.chat_send);
 		send.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				if (confi) {
+					if (TextUtils.isEmpty(edit.getText().toString())) {
+						alert("消息不能为空！");
+						return;
+					}
 					new Thread(new Runnable() {
 						@Override
 						public void run() {
@@ -107,7 +113,7 @@ public class MainActivity extends BaseActivity
 		Toast.makeText(MainActivity.this, text, Toast.LENGTH_SHORT).show();
 	}
 	
-	private void err(Exception e) {
+	public static void err(Exception e) {
 		print(sys, "程序出现错误！");
 		print(sys, "错误详情:\n"+e.toString());
 	}
