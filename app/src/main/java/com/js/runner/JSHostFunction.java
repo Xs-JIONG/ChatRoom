@@ -44,7 +44,7 @@ public class JSHostFunction extends ImporterTopLevel
 	}
 	
 	public void initFunction() {
-		String[] con={"print","alert","exit"};
+		String[] con={"print","exit"};
 		fc=new String[]{};
 		add(con);
 	}
@@ -76,9 +76,9 @@ public class JSHostFunction extends ImporterTopLevel
 		Toast.makeText(MainActivity.ctx, what.toString(), Toast.LENGTH_SHORT).show();
 	}
 	
-	public AlertDialog.Builder alert(String title, String msg) {
+	/*public AlertDialog.Builder alert(String title, String msg) {
 		return UI.showMessage(MainActivity.ctx, title, msg);
-	}
+	}*/
 	
 	public void exit() {
 		((Activity) MainActivity.ctx).finish();

